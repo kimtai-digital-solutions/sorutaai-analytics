@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Salvation Army Kimaswa School - Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                        school: '#DC2626'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white !important; }
+        }
+        .print-only { display: none; }
+    </style>
+</head>
+<body class="h-full bg-gray-50 dark:bg-gray-900">
+    <!-- Dark mode support -->
+    <script>
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+    </script>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <div class="text-center">
+                <img src="https://pfst.cf2.poecdn.net/base/image/cec6b0e017338f4b6d1f618b2d3a272f3e2866933bee5a5f98fedf182c443a97?w=548&h=445" alt="School Logo" class="mx-auto h-24 w-24 object-contain">
+                <h2 class="mt-6 text-3xl font-extrabold text-gray-900 dark:text-white">
+                    The Salvation Army Kimaswa School
+                </h2>
+                <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                    Management System Login
+                </p>
+                <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                    P.O. BOX 131-50201, CHEPTAIS<br>
+                    MOTTO: STRIVE TO SUCCEED
+                </p>
+            </div>
+            <form class="mt-8 space-y-6" onsubmit="handleLogin(event)">
+                <div class="rounded-md shadow-sm -space-y-px">
+                    <div>
+                        <select id="userRole" class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 text-base dark:bg-gray-800 dark:border-gray-600 dark:text-white" required>
+                            <option value="">Select Role</option>
+                            <option value="admin">Administrator</option>
+                            <option value="teacher">Teacher</option>
+                            <option value="parent">Parent</option>
+                        </select>
+                    </div>
+                    <div>
+                        <input id="username" name="username" type="text" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 text-base dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400" placeholder="Username">
+                    </div>
+                    <div>
+                        <input id="password" name="password" type="password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 text-base dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400" placeholder="Password">
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <button type="button" onclick="showPasswordReset()" class="text-sm text-primary hover:text-primary/80">
+                        Forgot your password?
+                    </button>
+                </div>
+
+                <div>
+                    <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        Sign in
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Password Reset Modal -->
+    <div id="passwordResetModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
+            <div class="mt-3 text-center">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Reset Password</h3>
+                <form onsubmit="handlePasswordReset(event)" class="mt-4">
+                    <input type="text" id="resetUsername" placeholder="Enter your username" class="w-full px-3 py-2 border border-gray-300 rounded-md text-base dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                    <div class="mt-4 flex justify-between">
+                        <button type="button" onclick="hidePasswordReset()" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">Cancel</button>
+                        <button type="submit" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90">Reset</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboard" class="hidden min-h-screen bg-gray-50 dark:bg-gray-900">
+        <!-- Navigation -->
+        <nav class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 no-print">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center">
+                        <img src="https://pfst.cf2.poecdn.net/base/image/cec6b0e017338f4b6d1f618b2d3a272f3e2866933bee5a5f98fedf182c443a97?w=548&h=445" alt="School Logo" class="h-8 w-8 object-contain">
+                        <span class="ml-2 text-xl font-semibold text-gray-900 dark:text-white">Kimaswa School</span>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span id="userInfo" class="text-sm text-gray-700 dark:text-gray-300"></span>
+                        <button onclick="logout()" class="bg-school text-white px-4 py-2 rounded-md text-sm hover:bg-school/90">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <!-- Dashboard Overview -->
+            <div id="dashboardHome" class="space-y-6">
+                <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">School Management Dashboard</h1>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="dashboardStats">
+                        <!-- Stats will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4" id="quickActions">
+                        <!-- Actions will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Panel -->
+            <div id="adminPanel" class="hidden space-y-6">
+                <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Administrator Panel</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <button onclick="showStudentManagement()" class="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30">
+                            <h3 class="font-semibold text-blue-900 dark:text-blue-300">Student Management</h3>
+                            <p class="text-sm text-blue-700 dark:text-blue-400">Register, edit, delete students</p>
+                        </button>
+                        <button onclick="showTeacherManagement()" class="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30">
+                            <h3 class="font-semibold text-green-900 dark:text-green-300">Teacher Management</h3>
+                            <p class="text-sm text-green-700 dark:text-green-400">Register, edit, delete teachers</p>
+                        </button>
+                        <button onclick="showMarksManagement()" class="p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30">
+                            <h3 class="font-semibold text-purple-900 dark:text-purple-300">Marks Management</h3>
+                            <p class="text-sm text-purple-700 dark:text-purple-400">Edit marks, process results</p>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Student Management -->
+            <div id="studentManagement" class="hidden space-y-6">
+                <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Student Management</h2>
+                        <button onclick="showAddStudent()" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90">
+                            Add Student
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead class="bg-gray-50 dark:bg-gray-700">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">S.I. No.</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Assessment No.</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Gender</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Grade</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentsTable" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                <!-- Students will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add/Edit Student Modal -->
+            <div id="studentModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+                <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
+                    <h3 id="studentModalTitle" class="text-lg font-medium text-gray-900 dark:text-white mb-4">Add Student</h3>
+                    <form onsubmit="saveStudent(event)">
+                        <input type="hidden" id="studentId">
+                        <div class="space-y-4">
+                            <input type="text" id="studentSINo" placeholder="S.I. Number" class="w-full px-3 py-2 border border-gray-300 rounded-md text-base dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                            <input type="text" id="studentAssessmentNo" placeholder="Assessment Number" class="w-full px-3 py-2 border border-gray-300 rounded-md text-base dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                            <input type="text" id="studentName" placeholder="Full Name" class="w-full px-3 py-2 border border-gray-300 rounded-md text-base dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                            <select id="studentGender" class="w-full px-3 py-2 border border-gray-300 rounded-md text-base dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                            <select id="studentGrade" class="w-full px-3 py-2 border border-gray-300 rounded-md text-base dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                                <option value="">Select Grade</option>
+                                <option value="7N">Grade 7N</option>
+                                <option value="7S">Grade 7S</option>
+                                <option value="8N">Grade 8N</option>
+                                <option value="8S">Grade 8S</option>
+                                <option value="9N">Grade 9N</option>
+                                <option value="9S">Grade 9S</option>
+                            </select>
+                        </div>
+                        <div class="mt-6 flex justify-between">
+                            <button type="button" onclick="hideStudentModal()" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">Cancel</button>
+                            <button type="submit" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Teacher Management -->
+            <div id="teacherManagement" class="hidden space-y-6">
+                <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Teacher Management</h2>
+                        <button onclick="showAddTeacher()" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90">
+                            Add Teacher
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead class="bg-gray-50 dark:bg-gray-700">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Subject</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Class Teacher</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Username</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teachersTable" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                <!-- Teachers will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add/Edit Teacher Modal -->
+            <div id="teacherModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+                <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
+                    <h3 id="teacherModalTitle" class="text-lg font-medium text-gray-900 dark:text-white mb-4">Add Teacher</h3>
+                    <form onsubmit="saveTeacher(event)">
+                        <input type="hidden" id="teacherId">
+                        <div class="space-y-4">
+                            <input type="text" id="teacherName" placeholder="Full Name" class="w-full px-3 py-2 border border-gray-300 rounded-md text-base dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                            <select id="teacherSubject" class="w-full px-3 py-2 border border-gray-300 rounded-md text-base dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                                <option value="">Select Subject</option>
+                                <option value="ENGLISH 901">ENGLISH 901</option>
+                                <option value="KISWAHILI 902">KISWAHILI 902</option>
+                                <option value="MATHEMATICS 903">MATHEMATICS 903</option>
+                                <option value="INTEGRATED SCIENCE 905">INTEGRATED SCIENCE 905</option>
+                                <option value="AGRICULTURE AND NUTRITION 906">AGRICULTURE AND NUTRITION 906</option>
+                                <option value="SOCIAL STUDIES 907">SOCIAL STUDIES 907</option>
+                                <option value="CHRISTIAN RELIGIOUS 908">CHRISTIAN RELIGIOUS 908</option>
+                                <option value="CREATIVE ARTS AND SPORTS 911">CREATIVE ARTS AND SPORTS 911</option>
+                                <option value="PRE-TECHNICAL STUDIES 912">PRE-TECHNICAL STUDIES 912</option>
+                            </select>
+                            <select id="teacherClassTeacher" class="w-full px-3 py-2 border border-gray-300 rounded-md text-base dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                <option value="">Not a Class Teacher</option>
+                                <option value="7N">Grade 7N</option>
+                                <option value="7S">Grade 7S</option>
+                                <option value="8N">Grade 8N</option>
+                                <option value="8S">Grade 8S</option>
+                                <option value="9N">Grade 9N</option>
+                                <option value="9S">Grade 9S</option>
+                            </select>
+                            <input type="text" id="teacherUsername" placeholder="Username" class="w-full px-3 py-2 border border-gray-300 rounded-md text-base dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                            <input type="password" id="teacherPassword" placeholder="Password" class="w-full px-3 py-2 border border-gray-300 rounded-md text-base dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                        </div>
+                        <div class="mt-6 flex justify-between">
+                            <button type="button" onclick="hideTeacherModal()" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">Cancel</button>
+                            <button type="submit" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Marks Entry -->
+            <div id="marksEntry" class="hidden space-y-6">
+                <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Marks Entry</h2>
+                    <form onsubmit="loadStudentsForMarks(event)" class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+                        <select id="marksYear" class="px-3 py-2 border border-gray-300 rounded-md text-base dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                            <option value="">Select Year</option>
+                        </select>
+                        <select id="marksGrade" class="px-3 py-2 border border-gray-300 rounded-md text-base dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                            <option value="">Select Grade</option>
+                            <option value="7N">Grade 7N</option>
+                            <option value="7S">Grade 7S</option>
+                            <option value="8N">Grade 8N</option>
+                            <option value="8S">Grade 8S</option>
+                            <option value="9N">Grade 9N</option>
+                            <option value="9S">Grade 9S</option>
+                        </select>
+                        <select id="marksTerm" class="px-3 py-2 border border-gray-300 rounded-md text-base dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                            <option value="">Select Term</option>
+                            <option value="Term 1">Term 1</option>
+                            <option value="Term 2">Term 2</option>
+                            <option value="Term 3">Term 3</option>
+                        </select>
+                        <select id="marksExamType" class="px-3 py-2 border border-gray-300 rounded-md text-base dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                            <option value="">Select Exam Type</option>
+                            <option value="Midterm">Midterm</option>
+                            <option value="Endterm">Endterm</option>
+                        </select>
+                        <button type="submit" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90">
+                            Load Students
+                        </button>
+                    </form>
+                    
+                    <div id="marksEntryTable" class="hidden">
+                        <div class="mb-4">
+                            <label for="marksSubject" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Subject:</label>
+                            <select id="marksSubject" class="px-3 py-2 border border-gray-300 rounded-md text-base dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                                <option value="">Select Subject</option>
+                            </select>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <thead class="bg-gray-50 dark:bg-gray-700">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">S.I. No.</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Marks (out of 100)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="marksStudentsTable" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                    <!-- Students will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-4">
+                            <button onclick="submitMarks()" class="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700">
+                                Submit Marks
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports -->
+            <div id="reports" class="hidden space-y-6">
+                <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Reports</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <button onclick="showMarksheet()" class="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30">
+                            <h3 class="font-semibold text-blue-900 dark:text-blue-300">Marksheet</h3>
+                            <p class="text-sm text-blue-700 dark:text-blue-400">Generate blank marksheets for exams</p>
+                        </button>
+                        <button onclick="showReportCard()" class="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30">
+                            <h3 class="font-semibold text-green-900 dark:text-green-300">Report Cards</h3>
+                            <p class="text-sm text-green-700 dark:text-green-400">Generate student report cards</p>
+                        </button>
+                        <button onclick="showBroadsheet()" class="p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30">
+                            <h3 class="font-semibold text-purple-900 dark:text-purple-300">Broadsheet</h3>
+                            <p class="text-sm text-purple-700 dark:text-purple-400">Class analysis and rankings</p>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Marksheet Generation -->
+            <div id="marksheetGeneration" class="hidden space-y-6">
+                <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Generate Marksheet</h2>
+                    <form onsubmit="generateMarksheet(event)" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                        <select id="marksheetYear" class="px-3 py-2 border border-gray-300 rounded-md text-base dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                            <option value="">Select Year</option>
+                        </select>
+                        <select id="marksheetGrade" class="px-3 py-2 border border-gray-300 rounded-md text-base dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                            <option value="">Select Grade</option>
+                            <option value="7N">Grade 7N</option>
+                            <option value="7S">Grade 7S</option>
+                            <option value="8N">Grade 8N</option>
+                            <option value="8S">Grade 8S</option>
+                            <option value="9N">Grade 9N</option>
+                            <option value="9S">Grade 9S</option>
+                        </select>
+                        <select id="marksheetTerm" class="px-3 py-2 border border-gray-300 rounded-md text-base dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                            <option value="">Select Term</option>
+                            <option value="Term 1">Term 1</option>
+                            <option value="Term 2">Term 2</option>
+                            <option value="Term 3">Term 3</option>
+                        </select>
+                        <button type="submit" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90">
+                            Generate
+                        </button>
+                    </form>
+                    <div id="marksheetOutput"></div>
+                </div>
+            </div>
+
+            <!-- Announcements -->
+            <div id="announcements" class="hidden space-y-6">
+                <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Announcements</h2>
+                        <button onclick="showAddAnnouncement()" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90" id="addAnnouncementBtn">
+                            Add Announcement
+                        </button>
+                    </div>
+                    <div id="announcementsList" class="space-y-4">
+                        <!-- Announcements will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Announcement Modal -->
+            <div id="announcementModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+                <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Add Announcement</h3>
+                    <form onsubmit="saveAnnouncement(event)">
+                        <div class="space-y-4">
+                            <input type="text" id="announcementTitle" placeholder="Title" class="w-full px-3 py-2 border border-gray-300 rounded-md text-base dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                            <textarea id="announcementContent" placeholder="Content" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md text-base dark:bg-gray-700 dark:border-gray-600 dark:text-white" required></textarea>
+                            <select id="announcementTarget" class="w-full px-3 py-2 border border-gray-300 rounded-md text-base dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                                <option value="">Select Target Audience</option>
+                                <option value="all">All Users</option>
+                                <option value="teachers">Teachers Only</option>
+                                <option value="parents">Parents Only</option>
+                            </select>
+                        </div>
+                        <div class="mt-6 flex justify-between">
+                            <button type="button" onclick="hideAnnouncementModal()" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">Cancel</button>
+                            <button type="submit" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90">Post</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentUser = null;
+        let students = [];
+        let teachers = [];
+        let marks = [];
+        let announcements = [];
+
+        // Initialize app
+        function initApp() {
+            loadData();
+            populateYearSelects();
+        }
+
+        // Data persistence functions
+        function saveData() {
+            localStorage.setItem('schoolData', JSON.stringify({
+                students,
+                teachers,
+                marks,
+                announcements,
+                lastUpdated: new Date().toISOString()
+            }));
+        }
+
+        function loadData() {
+            const data = localStorage.getItem('schoolData');
+            if (data) {
+                const parsed = JSON.parse(data);
+                students = parsed.students || [];
+                teachers = parsed.teachers || [];
+                marks = parsed.marks || [];
+                announcements = parsed.announcements || [];
+            }
+            
+            // Initialize with default admin if no teachers exist
+            if (teachers.length === 0) {
+                teachers.push({
+                    id: 'admin1',
+                    name: 'System Administrator',
+                    subject: 'Administration',
+                    classTeacher: '',
+                    username: 'admin',
+                    password: 'admin123',
+                    role: 'admin'
+                });
+                saveData();
+            }
+        }
+
+        function populateYearSelects() {
+            const currentYear = new Date().getFullYear();
+            const yearSelects = document.querySelectorAll('#marksYear, #marksheetYear');
+            yearSelects.forEach(select => {
+                select.innerHTML = '<option value="">Select Year</option>';
+                for (let year = currentYear; year <= 2050; year++) {
+                    select.innerHTML += `<option value="${year}">${year}</option>`;
+                }
+            });
+        }
+
+        // Authentication functions
+        function handleLogin(event) {
+            event.preventDefault();
+            const role = document.getElementById('userRole').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Check credentials
+            let user = null;
+            if (role === 'admin') {
+                user = teachers.find(t => t.username === username && t.password === password && t.role === 'admin');
+            } else if (role === 'teacher') {
+                user = teachers.find(t => t.username === username && t.password === password && !t.role);
+            } else if (role === 'parent') {
+                // For demo purposes, allow any parent login
+                user = { username, role: 'parent' };
+            }
+
+            if (user) {
+                currentUser = { ...user, role };
+                showDashboard();
+            } else {
+                alert('Invalid credentials. Please try again.');
+            }
+        }
+
+        function showPasswordReset() {
+            document.getElementById('passwordResetModal').classList.remove('hidden');
+        }
+
+        function hidePasswordReset() {
+            document.getElementById('passwordResetModal').classList.add('hidden');
+        }
+
+        function handlePasswordReset(event) {
+            event.preventDefault();
+            const username = document.getElementById('resetUsername').value;
+            
+            // For demo purposes, just show success message
+            alert('Password reset instructions have been sent to your registered email.');
+            hidePasswordReset();
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('dashboard').classList.add('hidden');
+            hideAllPanels();
+        }
+
+        // Dashboard functions
+        function showDashboard() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            document.getElementById('userInfo').textContent = `${currentUser.name || currentUser.username} (${currentUser.role})`;
+            
+            loadDashboardStats();
+            loadQuickActions();
+            loadAnnouncements();
+            showDashboardHome();
+        }
+
+        function loadDashboardStats() {
+            const stats = [
+                { label: 'Total Students', value: students.length, color: 'blue' },
+                { label: 'Total Teachers', value: teachers.filter(t => !t.role).length, color: 'green' },
+                { label: 'Active Classes', value: 6, color: 'purple' },
+                { label: 'Announcements', value: announcements.length, color: 'yellow' }
+            ];
+
+            const statsHtml = stats.map(stat => `
+                <div class="bg-${stat.color}-50 dark:bg-${stat.color}-900/20 p-4 rounded-lg border border-${stat.color}-200 dark:border-${stat.color}-800">
+                    <div class="text-2xl font-bold text-${stat.color}-600 dark:text-${stat.color}-400">${stat.value}</div>
+                    <div class="text-${stat.color}-800 dark:text-${stat.color}-300">${stat.label}</div>
+                </div>
+            `).join('');
+
+            document.getElementById('dashboardStats').innerHTML = statsHtml;
+        }
+
+        function loadQuickActions() {
+            const actions = [];
+            
+            if (currentUser.role === 'admin') {
+                actions.push(
+                    { label: 'Students', icon: '👥', action: 'showStudentManagement()' },
+                    { label: 'Teachers', icon: '👨‍🏫', action: 'showTeacherManagement()' },
+                    { label: 'Reports', icon: '📊', action: 'showReports()' },
+                    { label: 'Marks', icon: '📝', action: 'showMarksEntry()' }
+                );
+            } else if (currentUser.role === 'teacher') {
+                actions.push(
+                    { label: 'Enter Marks', icon: '📝', action: 'showMarksEntry()' },
+                    { label: 'View Reports', icon: '📊', action: 'showReports()' }
+                );
+            } else if (currentUser.role === 'parent') {
+                actions.push(
+                    { label: 'View Results', icon: '📋', action: 'showParentView()' }
+                );
+            }
+
+            actions.push({ label: 'Announcements', icon: '📢', action: 'showAnnouncements()' });
+
+            const actionsHtml = actions.map(action => `
+                <button onclick="${action.action}" class="p-4 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 text-center">
+                    <div class="text-2xl mb-2">${action.icon}</div>
+                    <div class="text-sm font-medium text-gray-900 dark:text-white">${action.label}</div>
+                </button>
+            `).join('');
+
+            document.getElementById('quickActions').innerHTML = actionsHtml;
+        }
+
+        // Navigation functions
+        function hideAllPanels() {
+            const panels = ['dashboardHome', 'adminPanel', 'studentManagement', 'teacherManagement', 'marksEntry', 'reports', 'marksheetGeneration', 'announcements'];
+            panels.forEach(panel => {
+                document.getElementById(panel).classList.add('hidden');
+            });
+        }
+
+        function showDashboardHome() {
+            hideAllPanels();
+            document.getElementById('dashboardHome').classList.remove('hidden');
+        }
+
+        function showAdminPanel() {
+            hideAllPanels();
+            document.getElementById('adminPanel').classList.remove('hidden');
+        }
+
+        function showStudentManagement() {
+            hideAllPanels();
+            document.getElementById('studentManagement').classList.remove('hidden');
+            loadStudentsTable();
+        }
+
+        function showTeacherManagement() {
+            hideAllPanels();
+            document.getElementById('teacherManagement').classList.remove('hidden');
+            loadTeachersTable();
+        }
+
+        function showMarksEntry() {
+            hideAllPanels();
+            document.getElementById('marksEntry').classList.remove('hidden');
+            loadSubjectOptions();
+        }
+
+        function showReports() {
+            hideAllPanels();
+            document.getElementById('reports').classList.remove('hidden');
+        }
+
+        function showMarksheet() {
+            hideAllPanels();
+            document.getElementById('marksheetGeneration').classList.remove('hidden');
+        }
+
+        function showAnnouncements() {
+            hideAllPanels();
+            document.getElementById('announcements').classList.remove('hidden');
+            
+            // Hide add button for parents
+            const addBtn = document.getElementById('addAnnouncementBtn');
+            if (currentUser.role === 'parent') {
+                addBtn.classList.add('hidden');
+            } else {
+                addBtn.classList.remove('hidden');
+            }
+        }
+
+        // Student management functions
+        function loadStudentsTable() {
+            const tbody = document.getElementById('studentsTable');
+            tbody.innerHTML = students.map((student, index) => `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">${student.siNo}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">${student.assessmentNo}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">${student.name}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">${student.gender}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">${student.grade}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button onclick="editStudent(${index})" class="text-primary hover:text-primary/80 mr-2">Edit</button>
+                        <button onclick="deleteStudent(${index})" class="text-red-600 hover:text-red-900">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function showAddStudent() {
+            document.getElementById('studentModalTitle').textContent = 'Add Student';
+            document.getElementById('studentId').value = '';
+            document.getElementById('studentSINo').value = '';
+            document.getElementById('studentAssessmentNo').value = '';
+            document.getElementById('studentName').value = '';
+            document.getElementById('studentGender').value = '';
+            document.getElementById('studentGrade').value = '';
+            document.getElementById('studentModal').classList.remove('hidden');
+        }
+
+        function editStudent(index) {
+            const student = students[index];
+            document.getElementById('studentModalTitle').textContent = 'Edit Student';
+            document.getElementById('studentId').value = index;
+            document.getElementById('studentSINo').value = student.siNo;
+            document.getElementById('studentAssessmentNo').value = student.assessmentNo;
+            document.getElementById('studentName').value = student.name;
+            document.getElementById('studentGender').value = student.gender;
+            document.getElementById('studentGrade').value = student.grade;
+            document.getElementById('studentModal').classList.remove('hidden');
+        }
+
+        function saveStudent(event) {
+            event.preventDefault();
+            const index = document.getElementById('studentId').value;
+            const student = {
+                siNo: document.getElementById('studentSINo').value,
+                assessmentNo: document.getElementById('studentAssessmentNo').value,
+                name: document.getElementById('studentName').value,
+                gender: document.getElementById('studentGender').value,
+                grade: document.getElementById('studentGrade').value
+            };
+
+            if (index === '') {
+                students.push(student);
+            } else {
+                students[parseInt(index)] = student;
+            }
+
+            saveData();
+            hideStudentModal();
+            loadStudentsTable();
+        }
+
+        function deleteStudent(index) {
+            if (confirm('Are you sure you want to delete this student?')) {
+                students.splice(index, 1);
+                saveData();
+                loadStudentsTable();
+            }
+        }
+
+        function hideStudentModal() {
+            document.getElementById('studentModal').classList.add('hidden');
+        }
+
+        // Teacher management functions
+        function loadTeachersTable() {
+            const tbody = document.getElementById('teachersTable');
+            tbody.innerHTML = teachers.filter(t => !t.role).map((teacher, index) => `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">${teacher.name}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">${teacher.subject}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">${teacher.classTeacher || 'N/A'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">${teacher.username}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button onclick="editTeacher('${teacher.id}')" class="text-primary hover:text-primary/80 mr-2">Edit</button>
+                        <button onclick="deleteTeacher('${teacher.id}')" class="text-red-600 hover:text-red-900">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function showAddTeacher() {
+            document.getElementById('teacherModalTitle').textContent = 'Add Teacher';
+            document.getElementById('teacherId').value = '';
+            document.getElementById('teacherName').value = '';
+            document.getElementById('teacherSubject').value = '';
+            document.getElementById('teacherClassTeacher').value = '';
+            document.getElementById('teacherUsername').value = '';
+            document.getElementById('teacherPassword').value = '';
+            document.getElementById('teacherModal').classList.remove('hidden');
+        }
+
+        function editTeacher(id) {
+            const teacher = teachers.find(t => t.id === id);
+            document.getElementById('teacherModalTitle').textContent = 'Edit Teacher';
+            document.getElementById('teacherId').value = id;
+            document.getElementById('teacherName').value = teacher.name;
+            document.getElementById('teacherSubject').value = teacher.subject;
+            document.getElementById('teacherClassTeacher').value = teacher.classTeacher;
+            document.getElementById('teacherUsername').value = teacher.username;
+            document.getElementById('teacherPassword').value = teacher.password;
+            document.getElementById('teacherModal').classList.remove('hidden');
+        }
+
+        function saveTeacher(event) {
+            event.preventDefault();
+            const id = document.getElementById('teacherId').value;
+            const teacher = {
+                id: id || 'teacher_' + Date.now(),
+                name: document.getElementById('teacherName').value,
+                subject: document.getElementById('teacherSubject').value,
+                classTeacher: document.getElementById('teacherClassTeacher').value,
+                username: document.getElementById('teacherUsername').value,
+                password: document.getElementById('teacherPassword').value
+            };
+
+            if (id === '') {
+                teachers.push(teacher);
+            } else {
+                const index = teachers.findIndex(t => t.id === id);
+                teachers[index] = teacher;
+            }
+
+            saveData();
+            hideTeacherModal();
+            loadTeachersTable();
+        }
+
+        function deleteTeacher(id) {
+            if (confirm('Are you sure you want to delete this teacher?')) {
+                const index = teachers.findIndex(t => t.id === id);
+                teachers.splice(index, 1);
+                saveData();
+                loadTeachersTable();
+            }
+        }
+
+        function hideTeacherModal() {
+            document.getElementById('teacherModal').classList.add('hidden');
+        }
+
+        // Marks entry functions
+        function loadSubjectOptions() {
+            const subjects = [
+                "ENGLISH 901", "KISWAHILI 902", "MATHEMATICS 903", 
+                "INTEGRATED SCIENCE 905", "AGRICULTURE AND NUTRITION 906", 
+                "SOCIAL STUDIES 907", "CHRISTIAN RELIGIOUS 908", 
+                "CREATIVE ARTS AND SPORTS 911", "PRE-TECHNICAL STUDIES 912"
+            ];
+
+            const select = document.getElementById('marksSubject');
+            
+            if (currentUser.role === 'teacher') {
+                // Teachers can only select their subject
+                const teacherSubject = currentUser.subject;
+                select.innerHTML = `<option value="${teacherSubject}">${teacherSubject}</option>`;
+            } else {
+                // Admins can select any subject
+                select.innerHTML = '<option value="">Select Subject</option>' + 
+                    subjects.map(subject => `<option value="${subject}">${subject}</option>`).join('');
+            }
+        }
+
+        function loadStudentsForMarks(event) {
+            event.preventDefault();
+            const year = document.getElementById('marksYear').value;
+            const grade = document.getElementById('marksGrade').value;
+            const term = document.getElementById('marksTerm').value;
+            const examType = document.getElementById('marksExamType').value;
+
+            const gradeStudents = students.filter(s => s.grade === grade);
+            
+            const tbody = document.getElementById('marksStudentsTable');
+            tbody.innerHTML = gradeStudents.map(student => `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">${student.siNo}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">${student.name}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <input type="number" min="0" max="100" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md text-base dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                            data-student-id="${student.siNo}" placeholder="Enter marks">
+                    </td>
+                </tr>
+            `).join('');
+
+            document.getElementById('marksEntryTable').classList.remove('hidden');
+        }
+
+        function submitMarks() {
+            const year = document.getElementById('marksYear').value;
+            const grade = document.getElementById('marksGrade').value;
+            const term = document.getElementById('marksTerm').value;
+            const examType = document.getElementById('marksExamType').value;
+            const subject = document.getElementById('marksSubject').value;
+
+            if (!subject) {
+                alert('Please select a subject');
+                return;
+            }
+
+            const markInputs = document.querySelectorAll('#marksStudentsTable input[type="number"]');
+            const newMarks = [];
+
+            markInputs.forEach(input => {
+                if (input.value) {
+                    newMarks.push({
+                        studentId: input.dataset.studentId,
+                        year,
+                        grade,
+                        term,
+                        examType,
+                        subject,
+                        marks: parseInt(input.value),
+                        teacherId: currentUser.id || currentUser.username,
+                        submittedAt: new Date().toISOString()
+                    });
+                }
+            });
+
+            // Remove existing marks for this combination
+            marks = marks.filter(m => !(
+                m.year === year && m.grade === grade && m.term === term && 
+                m.examType === examType && m.subject === subject
+            ));
+
+            // Add new marks
+            marks.push(...newMarks);
+            saveData();
+
+            alert('Marks submitted successfully!');
+            document.getElementById('marksEntryTable').classList.add('hidden');
+        }
+
+        // Report generation functions
+        function generateMarksheet(event) {
+            event.preventDefault();
+            const year = document.getElementById('marksheetYear').value;
+            const grade = document.getElementById('marksheetGrade').value;
+            const term = document.getElementById('marksheetTerm').value;
+
+            const gradeStudents = students.filter(s => s.grade === grade);
+            const subjects = [
+                "ENGLISH 901", "KISWAHILI 902", "MATHEMATICS 903", 
+                "INTEGRATED SCIENCE 905", "AGRICULTURE AND NUTRITION 906", 
+                "SOCIAL STUDIES 907", "CHRISTIAN RELIGIOUS 908", 
+                "CREATIVE ARTS AND SPORTS 911", "PRE-TECHNICAL STUDIES 912"
+            ];
+
+            let pages = [];
+            const studentsPerPage = 40;
+            
+            for (let i = 0; i < gradeStudents.length; i += studentsPerPage) {
+                const pageStudents = gradeStudents.slice(i, i + studentsPerPage);
+                pages.push(generateMarksheetPage(pageStudents, year, grade, term, subjects, i + 1));
+            }
+
+            const output = pages.join('<div class="page-break"></div>');
+            document.getElementById('marksheetOutput').innerHTML = `
+                <div class="mb-4 no-print">
+                    <button onclick="printMarksheet()" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
+                        Print Marksheet
+                    </button>
+                </div>
+                ${output}
+            `;
+        }
+
+        function generateMarksheetPage(pageStudents, year, grade, term, subjects, startNumber) {
+            const maleCount = pageStudents.filter(s => s.gender === 'Male').length;
+            const femaleCount = pageStudents.filter(s => s.gender === 'Female').length;
+
+            return `
+                <div class="bg-white p-8 border print:shadow-none print:border-none">
+                    <div class="text-center mb-6">
+                        <img src="https://pfst.cf2.poecdn.net/base/image/cec6b0e017338f4b6d1f618b2d3a272f3e2866933bee5a5f98fedf182c443a97?w=548&h=445" 
+                            alt="School Logo" class="h-16 w-16 mx-auto mb-2 object-contain">
+                        <h1 class="text-xl font-bold">THE SALVATION ARMY KIMASWA SCHOOL</h1>
+                        <p class="text-sm">P.O. BOX 131-50201, CHEPTAIS</p>
+                        <p class="text-sm font-semibold">MOTTO: STRIVE TO SUCCEED</p>
+                        <div class="mt-4">
+                            <p class="font-semibold">MARKSHEET - ${year} | Grade ${grade} | ${term}</p>
+                        </div>
+                    </div>
+                    
+                    <table class="w-full border-collapse border border-black text-sm">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="border border-black p-2 text-left">S/No</th>
+                                <th class="border border-black p-2 text-left">S.I. No.</th>
+                                <th class="border border-black p-2 text-left">Assessment No.</th>
+                                <th class="border border-black p-2 text-left">Name</th>
+                                <th class="border border-black p-2 text-left">Gender</th>
+                                ${subjects.map(subject => `<th class="border border-black p-2 text-center">${subject.split(' ')[0]}</th>`).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${pageStudents.map((student, index) => `
+                                <tr>
+                                    <td class="border border-black p-2">${startNumber + index}</td>
+                                    <td class="border border-black p-2">${student.siNo}</td>
+                                    <td class="border border-black p-2">${student.assessmentNo}</td>
+                                    <td class="border border-black p-2">${student.name}</td>
+                                    <td class="border border-black p-2">${student.gender}</td>
+                                    ${subjects.map(() => `<td class="border border-black p-2 h-8"></td>`).join('')}
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    
+                    <div class="mt-4 text-sm">
+                        <p><strong>Male Students:</strong> ${maleCount}</p>
+                        <p><strong>Female Students:</strong> ${femaleCount}</p>
+                        <p><strong>Total Students:</strong> ${pageStudents.length}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function printMarksheet() {
+            window.print();
+        }
+
+        // Announcements functions
+        function loadAnnouncements() {
+            const container = document.getElementById('announcementsList');
+            const userAnnouncements = announcements.filter(a => 
+                a.target === 'all' || a.target === currentUser.role
+            );
+
+            container.innerHTML = userAnnouncements.map(announcement => `
+                <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-semibold text-gray-900 dark:text-white">${announcement.title}</h3>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">${new Date(announcement.date).toLocaleDateString()}</span>
+                    </div>
+                    <p class="text-gray-700 dark:text-gray-300 mb-2">${announcement.content}</p>
+                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                        By: ${announcement.author} | Target: ${announcement.target}
+                    </div>
+                </div>
+            `).join('') || '<p class="text-gray-500 dark:text-gray-400">No announcements available.</p>';
+        }
+
+        function showAddAnnouncement() {
+            document.getElementById('announcementModal').classList.remove('hidden');
+        }
+
+        function hideAnnouncementModal() {
+            document.getElementById('announcementModal').classList.add('hidden');
+        }
+
+        function saveAnnouncement(event) {
+            event.preventDefault();
+            const announcement = {
+                id: Date.now(),
+                title: document.getElementById('announcementTitle').value,
+                content: document.getElementById('announcementContent').value,
+                target: document.getElementById('announcementTarget').value,
+                author: currentUser.name || currentUser.username,
+                date: new Date().toISOString()
+            };
+
+            announcements.unshift(announcement);
+            saveData();
+            hideAnnouncementModal();
+            loadAnnouncements();
+            
+            // Clear form
+            document.getElementById('announcementTitle').value = '';
+            document.getElementById('announcementContent').value = '';
+            document.getElementById('announcementTarget').value = '';
+        }
+
+        // Grade calculation functions
+        function calculateGrade(marks) {
+            if (marks >= 75) return { pl: 'EE', al: marks >= 88 ? 'AL8' : 'AL7', points: marks >= 88 ? 8 : 7 };
+            if (marks >= 50) return { pl: 'ME', al: marks >= 62 ? 'AL6' : marks >= 56 ? 'AL5' : 'AL4', points: marks >= 62 ? 6 : marks >= 56 ? 5 : 4 };
+            if (marks >= 25) return { pl: 'AE', al: marks >= 44 ? 'AL3' : marks >= 38 ? 'AL2' : 'AL1', points: marks >= 44 ? 3 : marks >= 38 ? 2 : 1 };
+            return { pl: 'BE', al: 'AL1', points: 1 };
+        }
+
+        // Initialize app when page loads
+        window.addEventListener('load', initApp);
+    </script>
+</body>
+</html>
